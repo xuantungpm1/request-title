@@ -78,7 +78,13 @@ def main():
     st.title('Request title')
 
     # Get message input from the user
-    message = st.text_input('Please input: <title> <hk/lk> <x> <y>')
+    message = st.text('Please input: <title> <hk/lk> <x> <y>')
+    message = st.text('Example:')
+    message = st.text('justice lk 1533 547')
+    message = st.text('scientist lk 1533 547')
+    message = st.text('duke lk 1533 547')
+    message = st.text('architect lk 1533 547')
+    message = st.text_input('')
 
     if st.button('Send Message') and message:
         # Wait for the bot to be ready before sending the message
