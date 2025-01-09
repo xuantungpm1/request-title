@@ -2,9 +2,8 @@ import streamlit as st
 import discord
 import asyncio
 import threading
-
-# Replace with your bot's token
-BOT_TOKEN = "MTMyNjc5ODU4NjY4MzU5Mjc1NQ.Gg1HZN.UCI0RAi-15dLaf_y99d1T0hgxG1y6bZIsB_OWw"
+from cryptography.hazmat.primitives.asymmetric import rsa, padding
+from cryptography.hazmat.primitives import serialization, hashes
 
 # Replace with your channel ID
 CHANNEL_ID = 1269107769462755349
@@ -39,12 +38,36 @@ class MyClient(discord.Client):
             self.loop.create_task(self.channel.send(message))
         else:
             print("Channel not found!")
+        
+def decrypt_key():
+    # Load private key from file
+    with open("private_key.pem", "rb") as private_file:
+        private_key = serialization.load_pem_private_key(
+            private_file.read(),
+            password=None,
+        )
+
+    # Load the encrypted message from file
+    with open("encrypted_message.bin", "rb") as enc_file:
+        encrypted_message = enc_file.read()
+
+    # Decrypt the message
+    decrypted_message = private_key.decrypt(
+        encrypted_message,
+        padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA256()),
+            algorithm=hashes.SHA256(),
+            label=None,
+        ),
+    )
+
+    return decrypted_message.decode()
 
 # Create and run the bot in a separate thread
 def run_bot():
     global client
     client = MyClient()
-    client.run(BOT_TOKEN)  # This runs the bot and manages its event loop
+    client.run(decrypt_key())  # This runs the bot and manages its event loop
 
 def main():
         # Start the bot in a separate thread to avoid blocking Streamlit
